@@ -12,62 +12,17 @@ const UserSchema = new mongoose.Schema({
     password: String
 })
 
-const LabelSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
-    },
-    title: {
-        type: String,
-        required: true
-    }
+const AdminSchema = new mongoose.Schema({
+    username: String,
+    email: String,
+    password: String
 })
 
-const NoteSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
-    },
-    title: {
-        type: String,
-        required: true
-    },
-    content: String,
-    labels: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Label'
-    }],
-    color: String,
-    isPinned: {
-        type: Boolean,
-        default: false
-    },
-    isArchived: {
-        type: Boolean,
-        default: false
-    },
-    collaborators: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
-});
 
 const User = mongoose.model("User", UserSchema);
-const Note = mongoose.model("Note", NoteSchema);
-const Label = mongoose.model("Label", LabelSchema);
+const Admin = mongoose.model("Admin", AdminSchema);
 
 module.exports = {
     User,
-    Note,
-    Label
+    Admin
 }

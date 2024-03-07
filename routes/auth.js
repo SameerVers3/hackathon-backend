@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { User } = require("../database")
+const { User, Admin } = require("../database")
 const jwt = require("jsonwebtoken");
 const router = Router();
 
@@ -74,6 +74,60 @@ router.post("/login", async (req, res) => {
     let password = req.body.password;
 
     const user = await User.findOne({
+        username,
+        password
+    })
+
+    if (user){
+        const token = jwt.sign({
+            username
+        }, JWT_SECRET);
+
+        res.json({
+            token
+        })
+    }
+    else {
+        res.status(411).json({
+            message: "Incorrect email and password"
+        })
+    }
+})
+
+
+
+router.get("/verify", async (req, res) => {
+    let token = req.headers.authorization;
+    console.log(token)
+    if (token){
+        try {
+            console.log("inside try")
+            const data = jwt.verify(token, JWT_SECRET);
+            console.log("verified")
+            console.log(data)
+            res.json({
+                username: data.username
+            })
+        }
+        catch (e){
+            console.log("inside catch")
+            res.status(401).json({
+                message: "Invalid Token"
+            })
+        }
+    }
+    else {
+        res.status(401).json({
+            message: "Invalid Token"
+        })
+    }
+})
+
+router.post("/adminlogin", async (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+
+    const user = await Admin.findOne({
         username,
         password
     })
