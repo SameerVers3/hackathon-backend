@@ -7,9 +7,26 @@ mongoose.connect(`mongodb://admin:DaMaYESNFVTQ2jMs@ac-oduhene-shard-00-00.6k5ywb
 const UserSchema = new mongoose.Schema({
     username: String,
     email: String,
-    acountNumber: Number,
+    accountNumber: Number,
     phone: Number,
-    password: String
+    password: String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+const PaymentSchema = new mongoose.Schema({
+    accountNumber: Number,
+    status: String,
+    description: String,
+    bank: String,
+    customer: String,
+    amount: Number,
+    date: {
+        type: Date,
+        default: Date.now
+    }
 })
 
 const AdminSchema = new mongoose.Schema({
@@ -21,8 +38,9 @@ const AdminSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 const Admin = mongoose.model("Admin", AdminSchema);
-
+const Payment = mongoose.model("Payment", PaymentSchema);
 module.exports = {
     User,
-    Admin
+    Admin,
+    Payment
 }

@@ -129,7 +129,7 @@ router.post("/adminlogin", async (req, res) => {
 
     const user = await Admin.findOne({
         username,
-        password
+        password 
     })
 
     if (user){
@@ -137,40 +137,13 @@ router.post("/adminlogin", async (req, res) => {
             username
         }, JWT_SECRET);
 
-        res.json({
+        res.json({ 
             token
         })
     }
     else {
         res.status(411).json({
             message: "Incorrect email and password"
-        })
-    }
-})
-
-router.get("/verify", async (req, res) => {
-    let token = req.headers.authorization;
-    console.log(token)
-    if (token){
-        try {
-            console.log("inside try")
-            const data = jwt.verify(token, JWT_SECRET);
-            console.log("verified")
-            console.log(data)
-            res.json({
-                username: data.username
-            })
-        }
-        catch (e){
-            console.log("inside catch")
-            res.status(401).json({
-                message: "Invalid Token"
-            })
-        }
-    }
-    else {
-        res.status(401).json({
-            message: "Invalid Token"
         })
     }
 })

@@ -1,19 +1,19 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = "hello";
+const JWT_SECRET = "procom";
 
 function authMiddleware(req, res, next) {
     const token = req.headers.authorization;
-    const words = token.split(" ")
-    const jwtToken = words[1];
 
     try {
-        const decoded = jwt.verify(jwtToken, JWT_SECRET);
-        if (decoded.username){
+        console.log(token);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded){
             console.log("authenticated");
             next();
         }
         else{
+            console.log("unauthenticated");
             res.status(403).json({
                 message: "Unauthorized"
             })

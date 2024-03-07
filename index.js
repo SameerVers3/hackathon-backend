@@ -4,14 +4,15 @@ const cors = require('cors')
 const app = express();
 const auth = require("./routes/auth");
 const authMiddleware = require("./middleware/authMiddleware")
-const notes = require("./routes/notes");
-const labels = require("./routes/labels");
+const data = require("./routes/data");
+const request = require("./routes/request");
 
 app.use(cors())
 app.use(bodyParser.json());
 app.use("/auth", auth);
-app.use("/notes", notes);
-app.use("/label", labels);
+app.use("/data", data);
+app.use("/request", request);
+
 
 app.use ((err, req, res, next)=>{
     res.status(500).json({
