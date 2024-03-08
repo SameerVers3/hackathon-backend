@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { User, Admin } = require("../database")
+const { User, Merchant } = require("../database")
 const jwt = require("jsonwebtoken");
 const router = Router();
 
@@ -83,8 +83,10 @@ router.post("/login", async (req, res) => {
             username
         }, JWT_SECRET);
 
-        res.json({
-            token
+        res.json(
+        {
+            token,
+            success: true
         })
     }
     else {
@@ -98,6 +100,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/verify", async (req, res) => {
     let token = req.headers.authorization;
+    let mode = req.headers.type;
     console.log(token)
     if (token){
         try {
@@ -105,9 +108,43 @@ router.get("/verify", async (req, res) => {
             const data = jwt.verify(token, JWT_SECRET);
             console.log("verified")
             console.log(data)
-            res.json({
-                username: data.username
-            })
+
+            if (mode === "merchant"){
+                console.log("inside merchant")
+                const user = await Merchant.findOne({
+                    username: data.username
+                })
+                const accountNumber = user.accountNumber;
+                console.log(accountNumber)
+                console.log(user)
+                if (!user){
+                    console.log("inside if")
+                    res.status(401).json({
+                        message: "Invalid Token"
+                    })
+                }
+                else {
+                    res.json({
+                        username: data.username,
+                        accountNumber: accountNumber
+                    })
+                }
+            }
+            else {
+                const user = await User.findOne({
+                    username: data.username
+                })
+                if (!user){
+                    res.status(401).json({
+                        message: "Invalid Token"
+                    })
+                }else {
+                    res.json({
+                        username: user.username,
+                        accountNumber: user.accountNumber
+                    })
+                }
+            }
         }
         catch (e){
             console.log("inside catch")
@@ -123,11 +160,13 @@ router.get("/verify", async (req, res) => {
     }
 })
 
-router.post("/adminlogin", async (req, res) => {
+
+
+router.post("/merchantlogin", async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
-    const user = await Admin.findOne({
+    const user = await Merchant.findOne({
         username,
         password 
     })
@@ -137,13 +176,69 @@ router.post("/adminlogin", async (req, res) => {
             username
         }, JWT_SECRET);
 
-        res.json({ 
+        console.log(token)
+        res.json({
             token
         })
     }
     else {
         res.status(411).json({
             message: "Incorrect email and password"
+        })
+    }
+})
+
+router.post("/merchantsign", async (req, res) => {
+    let remail = req.body.email;
+    let rpassword = req.body.password;
+    let rphone = req.body.phone;
+    let raccountNumber = req.body.accountNumber;
+    let rusername = req.body.username;
+    
+    console.log(raccountNumber);
+    let email = emailSchema.safeParse(remail);
+    let pass = passwordSchema.safeParse(rpassword);
+    let phone = phoneSchema.safeParse(rphone);
+    let accountNumber = accountNumberSchema.safeParse(raccountNumber);
+    let username = usernameSchema.safeParse(rusername);
+
+
+    console.log(email);
+    console.log(pass);
+    console.log(phone);
+    console.log(accountNumber);
+    console.log(username);
+
+    if (email.success && pass.success && phone.success && accountNumber.success && username.success){
+        let user = await Merchant.findOne({
+            "email": remail,
+            "username": rusername
+        })
+
+
+
+        if (user){
+            res.status(409).json({
+                message: "User already Exist"
+            })
+        }
+        else{
+            await Merchant.create({
+                "email": remail,
+                "password": rpassword,
+                "phone": rphone,
+                "accountNumber": raccountNumber,
+                "username": rusername
+            })
+
+            res.json({
+                message: "User Created Successfully"
+            })
+        }
+    }
+    else {
+        res.status(400).json({
+            message: "Invalid Input"
         })
     }
 })

@@ -23,24 +23,32 @@ const PaymentSchema = new mongoose.Schema({
     bank: String,
     customer: String,
     amount: Number,
+    merchant: Number,
     date: {
         type: Date,
         default: Date.now
     }
 })
 
-const AdminSchema = new mongoose.Schema({
+const MerchantSchema = new mongoose.Schema({
     username: String,
     email: String,
-    password: String
+    accountNumber: Number,
+    phone: Number,
+    password: String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 })
 
 
 const User = mongoose.model("User", UserSchema);
-const Admin = mongoose.model("Admin", AdminSchema);
+const Merchant = mongoose.model("Merchant", MerchantSchema)
 const Payment = mongoose.model("Payment", PaymentSchema);
+
 module.exports = {
     User,
-    Admin,
+    Merchant,
     Payment
 }
